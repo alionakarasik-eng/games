@@ -1,0 +1,73 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #111;
+  font-family: Arial, sans-serif;
+}
+
+#start {
+  position: fixed;
+  inset: 0;
+  background: #111;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+#app {
+  height: 100vh;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  width: 90%;
+  max-width: 700px;
+  min-height: 320px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transition: background 0.4s, transform 0.3s;
+}
+
+.card.correct { background: #c8f7c5; }
+.card.wrong { background: #f7c5c5; }
+
+#question {
+  font-size: 24px;
+}
+
+#answer {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+#score {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.buttons {
+  margin-top: 25px;
+}
+
+button {
+  padding: 14px 30px;
+  margin: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#myth { background: #ff6b6b; }
+#fact { background: #1dd1a1; }
+#next { display: none; background: #54a0ff; }
