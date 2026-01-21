@@ -1,100 +1,22 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Миф или Факт: Экология</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #111;
-  font-family: Arial, sans-serif;
-}
-
-#app {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  width: 90%;
-  max-width: 700px;
-  min-height: 300px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 30px;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  transition: transform 0.6s ease, background 0.4s ease;
-}
-
-.card.correct {
-  background: #c8f7c5;
-}
-
-.card.wrong {
-  background: #f7c5c5;
-}
-
-.card.hide {
-  transform: rotateY(90deg);
-}
-
-#question {
-  font-size: 24px;
-}
-
-.buttons {
-  margin-top: 30px;
-}
-
-button {
-  padding: 14px 30px;
-  margin: 10px;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-#myth { background:#ff6b6b; }
-#fact { background:#1dd1a1; }
-
-#next {
-  display:none;
-  background:#54a0ff;
-}
-
-#start {
-  position: absolute;
-  inset: 0;
-  background:#111;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:30px;
-  cursor:pointer;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Myth or Fact: Ecology</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div id="start">▶ Начать игру</div>
 
-<div id="app" style="display:none;">
+<div id="app">
   <div class="card" id="card">
     <div id="question"></div>
-    <div id="answer" style="margin-top:20px; font-size:18px;"></div>
+    <div id="answer"></div>
+    <div id="score"></div>
 
-
-    
     <div class="buttons">
       <button id="myth">Миф</button>
       <button id="fact">Факт</button>
@@ -103,73 +25,6 @@ button {
   </div>
 </div>
 
-<script>
-const questions = [
-  {q: "Повышение CO₂ всегда напрямую повышает температуру на Земле.", a: "Миф", exp: "Есть локальные циклы, которые могут временно маскировать эффект."},
-  {q: "Арктика тает быстрее, чем Антарктида, потому что там меньше льда.", a: "Факт", exp: "Северные льды тоньше и тают быстрее."},
-  {q: "Ледники в Гренландии тают только из-за естественных циклов Земли.", a: "Миф", exp: "Учёные подтверждают, что антропогенные выбросы ускоряют таяние."},
-  {q: "За последние 100 лет средняя температура Земли поднялась примерно на 1°C.", a: "Факт", exp: "Именно такое потепление зафиксировано климатологами."},
-  {q: "Пластик в океане разлагается полностью через 5 лет.", a: "Миф", exp: "Пластик разлагается сотни лет и образует микропластик."},
-  {q: "Электромобили полностью безопасны для экологии.", a: "Миф", exp: "Производство батарей тоже наносит вред окружающей среде."},
-  {q: "Все животные одинаково реагируют на изменение климата.", a: "Миф", exp: "Реакция видов различается: миграция, адаптация или вымирание."},
-  {q: "Некоторые виды животных восстановились благодаря законам о защите природы.", a: "Факт", exp: "Пример: калан и некоторые виды орлов."},
-  {q: "Ветряные и солнечные электростанции не влияют на природу.", a: "Миф", exp: "Строительство может влиять на экосистемы, но польза выше."},
-  {q: "Отказ от угля снижает выбросы CO₂.", a: "Факт", exp: "Это подтверждено опытом стран Северной Европы."}
-
-];
-
-let current = 0;
-
-const card = document.getElementById("card");
-const qEl = document.getElementById("question");
-const nextBtn = document.getElementById("next");
-
-function showQuestion() {
-  card.className = "card hide";
-  setTimeout(() => {
-    qEl.innerText = questions[current].q;
-    document.getElementById("answer").innerText = "";
-    card.className = "card";
-    nextBtn.style.display = "none";
-  }, 300);
-}
-
-function answer(ans) {
-  const correct = questions[current].a === ans;
-  card.classList.add(correct ? "correct" : "wrong");
-
-  document.getElementById("answer").innerText =
-    (correct ? "✔ Правильно. " : "✖ Неправильно. ") +
-    questions[current].e;
-
-  nextBtn.style.display = "inline-block";
-}
-
-
-  const correct = questions[current].a === ans;
-  card.classList.add(correct ? "correct" : "wrong");
-  nextBtn.style.display = "inline-block";
-}
-
-nextBtn.onclick = () => {
-  card.classList.remove("correct","wrong");
-  current++;
-  if (current < questions.length) showQuestion();
-  else qEl.innerText = "Игра окончена 🎉";
-};
-
-document.getElementById("myth").onclick = () => answer("Миф");
-document.getElementById("fact").onclick = () => answer("Факт");
-
-document.getElementById("start").onclick = () => {
-  document.documentElement.requestFullscreen?.();
-  document.getElementById("start").style.display = "none";
-  document.getElementById("app").style.display = "flex";
-  showQuestion();
-};
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
-
-  
