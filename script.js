@@ -1,4 +1,6 @@
-// ================= НАСТРОЙКИ =================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ================= НАСТРОЙКИ =================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/execУ";
 
 // ================= ВОПРОСЫ =================
@@ -111,3 +113,4 @@ function sendProgress(final = false) {
 
 // ================= ЕСЛИ ЗАКРЫЛИ СТРАНИЦУ =================
 window.addEventListener("beforeunload", () =>
+});
