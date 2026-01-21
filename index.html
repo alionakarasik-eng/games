@@ -129,6 +129,7 @@ function showQuestion() {
   card.className = "card hide";
   setTimeout(() => {
     qEl.innerText = questions[current].q;
+    document.getElementById("answer").innerText = "";
     card.className = "card";
     nextBtn.style.display = "none";
   }, 300);
