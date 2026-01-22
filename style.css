@@ -6,6 +6,10 @@ html, body {
   font-family: Arial, sans-serif;
 }
 
+.hidden {
+  display: none;
+}
+
 #start {
   position: fixed;
   inset: 0;
@@ -14,14 +18,13 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30px;
+  font-size: 28px;
   cursor: pointer;
-  z-index: 10;
 }
 
 #app {
   height: 100vh;
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -29,30 +32,27 @@ html, body {
 .card {
   width: 90%;
   max-width: 700px;
-  min-height: 320px;
   background: #fff;
-  border-radius: 16px;
   padding: 30px;
+  border-radius: 16px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  transition: background 0.4s, transform 0.3s;
+  transition: background 0.3s, transform 0.3s;
 }
 
-.card.correct { background: #c8f7c5; }
-.card.wrong { background: #f7c5c5; }
+.card.correct {
+  background: #c8f7c5;
+}
+
+.card.wrong {
+  background: #f7c5c5;
+}
 
 #question {
   font-size: 24px;
 }
 
-#answer {
+#explanation {
   margin-top: 20px;
-  font-size: 18px;
-}
-
-#score {
-  margin-top: 15px;
-  font-weight: bold;
 }
 
 .buttons {
@@ -68,6 +68,20 @@ button {
   cursor: pointer;
 }
 
-#myth { background: #ff6b6b; }
-#fact { background: #1dd1a1; }
-#next { display: none; background: #54a0ff; }
+#myth {
+  background:#ff6b6b;
+}
+
+#fact {
+  background:#1dd1a1;
+}
+
+#next {
+  background:#54a0ff;
+  display: none;
+}
+
+#score {
+  margin-top: 15px;
+  font-weight: bold;
+}
