@@ -105,7 +105,7 @@ function sendStats(isFinished) {
   if (now - lastSend < 3000) return;
   lastSend = now;
 
-  fetch("https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzcaYYZMgWN4M_db-VjyII7hbgAOoIfcMIkGWbLpXuTEEyz8Qu9W7dYTFFlp8rvjIC4/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -120,7 +120,7 @@ function sendStats(isFinished) {
 window.addEventListener("beforeunload", () => {
   if (!finished && answered > 0) {
     navigator.sendBeacon(
-      "https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/exec",
+      "https://script.google.com/macros/s/AKfycbzcaYYZMgWN4M_db-VjyII7hbgAOoIfcMIkGWbLpXuTEEyz8Qu9W7dYTFFlp8rvjIC4/exec",
       JSON.stringify({
         answered,
         correct,
