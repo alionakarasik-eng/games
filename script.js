@@ -113,4 +113,3 @@ window.addEventListener("beforeunload", () => {
     sendResult(false);
   }
 });
-
