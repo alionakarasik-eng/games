@@ -1,133 +1,116 @@
-document.addEventListener("DOMContentLoaded", () => {
+/******** НАСТРОЙКА ********/
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh3QsO6TMTJpk0exm9nuY90e8zuB8JuDPop8OA_60lIUFsrGBpVcuN5YxFztME-xhw/exec";
+const ANTI_SPAM_DELAY = 30000; // 30 секунд
 
+/******** ВОПРОСЫ (НЕ ТРОГАЕМ) ********/
 const questions = [
-  { q: "Повышение CO₂ всегда напрямую повышает температуру на Земле.", a: "Миф", e: "Есть природные циклы, временно маскирующие эффект." },
-  { q: "Арктика тает быстрее, чем Антарктида.", a: "Факт", e: "Арктический лёд тоньше и уязвимее." },
-  { q: "Пластик в океане разлагается за 5 лет.", a: "Миф", e: "Пластик разлагается сотни лет." },
-  { q: "Отказ от угля снижает выбросы CO₂.", a: "Факт", e: "Подтверждено опытом стран Европы." }
+  { q:"Повышение CO₂ всегда напрямую повышает температуру на Земле.", a:"Миф", exp:"Есть локальные циклы, которые могут временно маскировать эффект." },
+  { q:"Арктика тает быстрее, чем Антарктида.", a:"Факт", exp:"Северные льды тоньше и тают быстрее." },
+  { q:"Ледники в Гренландии тают только из-за естественных циклов.", a:"Миф", exp:"Антропогенные выбросы ускоряют процесс." },
+  { q:"За последние 100 лет температура Земли выросла примерно на 1°C.", a:"Факт", exp:"Это подтверждено климатологами." },
+  { q:"Пластик разлагается за 5 лет.", a:"Миф", exp:"Он разлагается сотни лет." }
 ];
 
+/******** СОСТОЯНИЕ ********/
 let current = 0;
+let score = 0;
 let answered = 0;
-let correct = 0;
-let finished = false;
-let lastSend = 0;
+let isFinished = false;
+let lastSendTime = 0;
 
-const start = document.getElementById("start");
-const app = document.getElementById("app");
+/******** ЭЛЕМЕНТЫ ********/
 const card = document.getElementById("card");
-const questionEl = document.getElementById("question");
-const explanationEl = document.getElementById("explanation");
-const scoreEl = document.getElementById("score");
-const mythBtn = document.getElementById("myth");
-const factBtn = document.getElementById("fact");
+const qEl = document.getElementById("question");
+const aEl = document.getElementById("answer");
 const nextBtn = document.getElementById("next");
 
-// START
-start.onclick = () => {
-  document.documentElement.requestFullscreen?.();
-  start.style.display = "none";
-  app.classList.remove("hidden");
-  showQuestion();
-};
-
-// SHOW QUESTION
+/******** ПОКАЗ ВОПРОСА ********/
 function showQuestion() {
-  card.className = "card";
-  explanationEl.innerText = "";
-  nextBtn.style.display = "none";
-  questionEl.innerText = questions[current].q;
-  updateScore();
+  card.className = "card hide";
+  setTimeout(() => {
+    qEl.innerText = questions[current].q;
+    aEl.innerText = "";
+    card.className = "card";
+    nextBtn.style.display = "none";
+  }, 300);
 }
 
-// ANSWER
+/******** ОТВЕТ ********/
 function answer(userAnswer) {
   if (nextBtn.style.display === "inline-block") return;
 
-  const q = questions[current];
+  const correct = questions[current].a === userAnswer;
   answered++;
 
-  if (userAnswer === q.a) {
-    correct++;
-    card.classList.add("correct");
-  } else {
-    card.classList.add("wrong");
-  }
+  if (correct) score++;
 
-  explanationEl.innerText = `Правильный ответ: ${q.a}. ${q.e}`;
+  card.classList.add(correct ? "correct" : "wrong");
+
+  aEl.innerText =
+    (correct ? "✔ Правильно. " : "✖ Неправильно. ") +
+    questions[current].exp;
+
   nextBtn.style.display = "inline-block";
-  sendStats(false);
 }
 
-// NEXT
+/******** ДАЛЕЕ ********/
 nextBtn.onclick = () => {
+  card.classList.remove("correct","wrong");
   current++;
+
   if (current < questions.length) {
     showQuestion();
   } else {
-    finished = true;
-    questionEl.innerText = "Игра окончена 🎉";
-    explanationEl.innerText = "";
-    mythBtn.disabled = true;
-    factBtn.disabled = true;
-    nextBtn.style.display = "none";
-    sendStats(true);
+    isFinished = true;
+    qEl.innerText = "Игра окончена 🎉";
+    aEl.innerText = `Результат: ${score} из ${answered}`;
+    sendResult(true);
   }
 };
 
-// SCORE
-function updateScore() {
-  scoreEl.innerText = `Ответил: ${answered} | Правильно: ${correct}`;
-}
+/******** КНОПКИ ********/
+document.getElementById("myth").onclick = () => answer("Миф");
+document.getElementById("fact").onclick = () => answer("Факт");
 
-// BUTTONS
-mythBtn.onclick = () => answer("Миф");
-factBtn.onclick = () => answer("Факт");
+/******** СТАРТ ********/
+document.getElementById("start").onclick = () => {
+  document.documentElement.requestFullscreen?.();
+  document.getElementById("start").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+  showQuestion();
+};
 
-// SWIPE
-let startX = null;
-
-card.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
+/******** СВАЙПЫ ********/
+let startX = 0;
+card.addEventListener("touchstart", e => startX = e.touches[0].clientX);
 card.addEventListener("touchend", e => {
-  if (startX === null) return;
-  const diff = e.changedTouches[0].clientX - startX;
-  if (diff > 60) answer("Факт");
-  if (diff < -60) answer("Миф");
-  startX = null;
+  const dx = e.changedTouches[0].clientX - startX;
+  if (dx > 60) answer("Факт");
+  if (dx < -60) answer("Миф");
 });
 
-// SEND TO GOOGLE SHEETS
-function sendStats(isFinished) {
+/******** ОТПРАВКА В GOOGLE SHEETS ********/
+function sendResult(finishedFlag) {
   const now = Date.now();
-  if (now - lastSend < 3000) return;
-  lastSend = now;
+  if (now - lastSendTime < ANTI_SPAM_DELAY) return;
+  lastSendTime = now;
 
-  fetch("https://script.google.com/macros/s/AKfycbzcaYYZMgWN4M_db-VjyII7hbgAOoIfcMIkGWbLpXuTEEyz8Qu9W7dYTFFlp8rvjIC4/exec", {
+  fetch(GOOGLE_SCRIPT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      answered,
-      correct,
-      finished: isFinished
+      score: score,
+      answered: answered,
+      total: questions.length,
+      finished: finishedFlag
     })
-  }).catch(() => {});
+  }).catch(err => console.error("Send error", err));
 }
 
-// CLOSE PAGE
+/******** ЕСЛИ ВЫШЛИ ИЗ ИГРЫ ********/
 window.addEventListener("beforeunload", () => {
-  if (!finished && answered > 0) {
-    navigator.sendBeacon(
-      "https://script.google.com/macros/s/AKfycbzcaYYZMgWN4M_db-VjyII7hbgAOoIfcMIkGWbLpXuTEEyz8Qu9W7dYTFFlp8rvjIC4/exec",
-      JSON.stringify({
-        answered,
-        correct,
-        finished: false
-      })
-    );
+  if (!isFinished && answered > 0) {
+    sendResult(false);
   }
 });
 
-});
