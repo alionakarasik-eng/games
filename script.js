@@ -1,116 +1,133 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ================= НАСТРОЙКИ =================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/execУ";
-
-// ================= ВОПРОСЫ =================
 const questions = [
-  {
-    q: "Plastic decomposes naturally in nature.",
-    a: false,
-    exp: "Plastic can take hundreds of years to decompose."
-  },
-  {
-    q: "Glass can be recycled endlessly.",
-    a: true,
-    exp: "Glass does not lose quality when recycled."
-  },
-  {
-    q: "Paper recycling saves trees.",
-    a: true,
-    exp: "Recycling paper reduces deforestation."
-  }
+  { q: "Повышение CO₂ всегда напрямую повышает температуру на Земле.", a: "Миф", e: "Есть природные циклы, временно маскирующие эффект." },
+  { q: "Арктика тает быстрее, чем Антарктида.", a: "Факт", e: "Арктический лёд тоньше и уязвимее." },
+  { q: "Пластик в океане разлагается за 5 лет.", a: "Миф", e: "Пластик разлагается сотни лет." },
+  { q: "Отказ от угля снижает выбросы CO₂.", a: "Факт", e: "Подтверждено опытом стран Европы." }
 ];
 
-// ================= ПЕРЕМЕННЫЕ =================
 let current = 0;
 let answered = 0;
 let correct = 0;
 let finished = false;
+let lastSend = 0;
 
-// ================= ЭЛЕМЕНТЫ =================
-const startBtn = document.getElementById("startBtn");
-const game = document.getElementById("game");
+const start = document.getElementById("start");
+const app = document.getElementById("app");
 const card = document.getElementById("card");
 const questionEl = document.getElementById("question");
-const feedbackEl = document.getElementById("feedback");
+const explanationEl = document.getElementById("explanation");
 const scoreEl = document.getElementById("score");
-const nextBtn = document.getElementById("nextBtn");
+const mythBtn = document.getElementById("myth");
+const factBtn = document.getElementById("fact");
+const nextBtn = document.getElementById("next");
 
-// ================= СТАРТ =================
-startBtn.onclick = () => {
+// START
+start.onclick = () => {
   document.documentElement.requestFullscreen?.();
-  startBtn.style.display = "none";
-  game.classList.remove("hidden");
+  start.style.display = "none";
+  app.classList.remove("hidden");
   showQuestion();
 };
 
-// ================= ПОКАЗ ВОПРОСА =================
+// SHOW QUESTION
 function showQuestion() {
-  card.className = "";
-  feedbackEl.innerText = "";
+  card.className = "card";
+  explanationEl.innerText = "";
   nextBtn.style.display = "none";
-
   questionEl.innerText = questions[current].q;
-  scoreEl.innerText = `Answered: ${answered} | Correct: ${correct}`;
+  updateScore();
 }
 
-// ================= ОТВЕТ =================
+// ANSWER
 function answer(userAnswer) {
-  if (finished) return;
+  if (nextBtn.style.display === "inline-block") return;
 
+  const q = questions[current];
   answered++;
-  const isCorrect = questions[current].a === userAnswer;
-  if (isCorrect) correct++;
 
-  card.classList.add(isCorrect ? "correct" : "wrong");
+  if (userAnswer === q.a) {
+    correct++;
+    card.classList.add("correct");
+  } else {
+    card.classList.add("wrong");
+  }
 
-  feedbackEl.innerText =
-    (isCorrect ? "✔ Correct. " : "✖ Wrong. ") +
-    questions[current].exp;
-
-  sendProgress();
+  explanationEl.innerText = `Правильный ответ: ${q.a}. ${q.e}`;
   nextBtn.style.display = "inline-block";
+  sendStats(false);
 }
 
-// ================= СЛЕДУЮЩИЙ ВОПРОС =================
+// NEXT
 nextBtn.onclick = () => {
   current++;
-
-  if (current >= questions.length) {
-    finishGame();
-  } else {
+  if (current < questions.length) {
     showQuestion();
+  } else {
+    finished = true;
+    questionEl.innerText = "Игра окончена 🎉";
+    explanationEl.innerText = "";
+    mythBtn.disabled = true;
+    factBtn.disabled = true;
+    nextBtn.style.display = "none";
+    sendStats(true);
   }
 };
 
-// ================= ФИНИШ =================
-function finishGame() {
-  finished = true;
-
-  questionEl.innerText = "Game finished!";
-  feedbackEl.innerText = `Final score: ${correct} / ${answered}`;
-  nextBtn.style.display = "none";
-
-  sendProgress(true);
+// SCORE
+function updateScore() {
+  scoreEl.innerText = `Ответил: ${answered} | Правильно: ${correct}`;
 }
 
-// ================= ОТПРАВКА ДАННЫХ =================
-function sendProgress(final = false) {
-  fetch(GOOGLE_SCRIPT_URL, {
+// BUTTONS
+mythBtn.onclick = () => answer("Миф");
+factBtn.onclick = () => answer("Факт");
+
+// SWIPE
+let startX = null;
+
+card.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+card.addEventListener("touchend", e => {
+  if (startX === null) return;
+  const diff = e.changedTouches[0].clientX - startX;
+  if (diff > 60) answer("Факт");
+  if (diff < -60) answer("Миф");
+  startX = null;
+});
+
+// SEND TO GOOGLE SHEETS
+function sendStats(isFinished) {
+  const now = Date.now();
+  if (now - lastSend < 3000) return;
+  lastSend = now;
+
+  fetch("https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/exec", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      answered: answered,
-      correct: correct,
-      total: questions.length,
-      percent: answered
-        ? Math.round((correct / answered) * 100)
-        : 0,
-      finished: final
+      answered,
+      correct,
+      finished: isFinished
     })
-  });
+  }).catch(() => {});
 }
 
-// ================= ЕСЛИ ЗАКРЫЛИ СТРАНИЦУ =================
-window.addEventListener("beforeunload", () =>
+// CLOSE PAGE
+window.addEventListener("beforeunload", () => {
+  if (!finished && answered > 0) {
+    navigator.sendBeacon(
+      "https://script.google.com/macros/s/AKfycbyRR9dchP0bzgR0_JS1zbbvq3WQn50H8qBU-jIJm_l90XJgy70J2rx7z-HiWyaNOzFt/exec",
+      JSON.stringify({
+        answered,
+        correct,
+        finished: false
+      })
+    );
+  }
+});
+
 });
