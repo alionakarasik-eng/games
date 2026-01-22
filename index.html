@@ -2,41 +2,31 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Миф или Факт: Экология</title>
+<title>Myth or Fact: Ecology</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- Стартовый экран -->
 <div id="start">▶ Начать игру</div>
 
-<!-- Приложение -->
-<div id="app" style="display:none;">
+<div id="app" class="hidden">
   <div class="card" id="card">
-
-    <!-- Вопрос -->
     <div id="question"></div>
+    <div id="explanation"></div>
 
-    <!-- Ответ -->
-    <div id="answer"></div>
-
-    <!-- Кнопки -->
     <div class="buttons">
       <button id="myth">Миф</button>
       <button id="fact">Факт</button>
       <button id="next">Далее</button>
     </div>
 
-    <!-- Счёт -->
     <div id="score"></div>
-
   </div>
 </div>
 
-<!-- JS ПОДКЛЮЧЁН В КОНЦЕ -->
 <script src="script.js"></script>
 </body>
 </html>
+
